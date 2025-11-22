@@ -10,7 +10,6 @@ from typing import Dict, List, Optional, Tuple
 import geopandas as gpd
 from shapely.geometry import Polygon, MultiPolygon, shape
 from rasterio.features import shapes as rio_shapes
-from scipy import ndimage
 from scipy.ndimage import binary_dilation, binary_erosion
 from skimage.morphology import remove_small_objects, binary_opening, binary_closing
 import json
