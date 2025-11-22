@@ -7,12 +7,10 @@ import geopandas as gpd
 import numpy as np
 import logging
 from typing import Dict, List, Optional, Tuple, Union
-from shapely.geometry import Polygon, MultiPolygon, Point
+from shapely.geometry import Polygon, MultiPolygon
 from shapely.ops import unary_union
 import json
 import os
-from pyproj import CRS
-import fiona
 import requests
 
 GOV_WFS_URL = os.getenv('GOV_WFS_URL', '').strip() or ''

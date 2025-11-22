@@ -5,18 +5,18 @@ Complete end-to-end system following approach.txt specifications
 
 from fastapi import FastAPI, HTTPException, UploadFile, File, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import Dict, List, Optional, Any
 import logging
-import asyncio
 import os
 import json
 import uuid
 from datetime import datetime
 import tempfile
 import shutil
-import math
+import geopandas as gpd
+from shapely.geometry import Polygon
 
 # Import our modules
 from gee_utils import GEEUtils, download_sentinel2_aoi, download_dem, download_sentinel1_sar
@@ -605,9 +605,6 @@ async def _run_illegal_mining_analysis(job_id: str, request: DetectionRequest):
 
 def _create_sample_lease_boundaries(aoi_geojson: Dict) -> Any:
     """Create sample lease boundaries for demo purposes"""
-    import geopandas as gpd
-    from shapely.geometry import Polygon
-    
     # Extract AOI bounds
     coords = aoi_geojson['coordinates'][0]
     min_lon = min(coord[0] for coord in coords)
