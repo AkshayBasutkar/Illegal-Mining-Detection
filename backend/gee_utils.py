@@ -40,22 +40,32 @@ class GEEUtils:
     
     def __init__(self):
         """Initialize GEE authentication and collections"""
+        self.initialized = False
         try:
             # Earth Engine Python SDK uses OAuth credentials, not API keys.
             # Ensure you've run `earthengine authenticate` once on this machine.
             project_id = os.getenv('EE_PROJECT_ID') or 'car-pooling-dc7a3'
             ee.Initialize(project=project_id)
+            self.initialized = True
             logger.info(f"✅ Google Earth Engine initialized (project={project_id})")
         except Exception as e:
-            logger.error(f"❌ GEE initialization failed: {e}")
-            raise
+            logger.warning(f"⚠️ GEE initialization failed: {e}")
+            logger.warning("⚠️ GEE features will not be available. Run 'earthengine authenticate' to enable.")
+            self.initialized = False
         
-        # Define satellite collections
-        self.sentinel2 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
-        self.sentinel1 = ee.ImageCollection('COPERNICUS/S1_GRD')
-        self.landsat8 = ee.ImageCollection('LANDSAT/LC08/C02/T1_L2')
-        self.srtm = ee.Image('USGS/SRTMGL1_003')
-        self.alos_dem = ee.Image('JAXA/ALOS/AW3D30/V2_2')
+        # Define satellite collections (only if initialized)
+        if self.initialized:
+            self.sentinel2 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
+            self.sentinel1 = ee.ImageCollection('COPERNICUS/S1_GRD')
+            self.landsat8 = ee.ImageCollection('LANDSAT/LC08/C02/T1_L2')
+            self.srtm = ee.Image('USGS/SRTMGL1_003')
+            self.alos_dem = ee.Image('JAXA/ALOS/AW3D30/V2_2')
+        else:
+            self.sentinel2 = None
+            self.sentinel1 = None
+            self.landsat8 = None
+            self.srtm = None
+            self.alos_dem = None
         
         # Define bands for different sensors
         self.sentinel2_bands = {
@@ -95,6 +105,9 @@ class GEEUtils:
         Returns:
             bool: Success status
         """
+        if not self.initialized:
+            logger.warning("⚠️ GEE not initialized. Creating demo data instead.")
+            return self._create_demo_sentinel2_composite(aoi_geojson, out_path, bands or ['B2', 'B3', 'B4', 'B8', 'B11', 'B12'])
         try:
             logger.info(f"🛰️ Downloading Sentinel-2 data for AOI from {start_date} to {end_date}")
             
@@ -175,6 +188,9 @@ class GEEUtils:
         Returns:
             bool: Success status
         """
+        if not self.initialized:
+            logger.warning("⚠️ GEE not initialized. Creating demo data instead.")
+            return self._create_demo_dem(aoi_geojson, out_path, source)
         try:
             logger.info(f"🗻 Downloading {source} DEM data for AOI")
             
@@ -224,6 +240,9 @@ class GEEUtils:
         Returns:
             bool: Success status
         """
+        if not self.initialized:
+            logger.warning("⚠️ GEE not initialized. Creating demo data instead.")
+            return self._create_demo_sar_composite(aoi_geojson, out_path, polarization)
         try:
             logger.info(f"📡 Downloading Sentinel-1 SAR data for AOI")
             
