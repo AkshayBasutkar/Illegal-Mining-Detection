@@ -9,11 +9,9 @@ import logging
 from typing import Dict, List, Optional, Tuple
 import geopandas as gpd
 from shapely.geometry import Polygon, MultiPolygon, shape
-from shapely.ops import unary_union
 from rasterio.features import shapes as rio_shapes
-from scipy import ndimage
+from scipy.ndimage import binary_dilation, binary_erosion
 from skimage.morphology import remove_small_objects, binary_opening, binary_closing
-from skimage.measure import label, regionprops
 import json
 import os
 
@@ -81,7 +79,6 @@ class MiningDetector:
                 cleaned_mask = self._clean_mask(mining_mask)
                 
                 # Apply additional morphological operations to connect nearby pixels
-                from scipy.ndimage import binary_dilation, binary_erosion
                 # Dilate to connect nearby pixels
                 cleaned_mask = binary_dilation(cleaned_mask, structure=np.ones((3, 3)))
                 # Erode back to original size

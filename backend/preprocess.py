@@ -10,9 +10,9 @@ from typing import Dict, List, Optional, Tuple
 import geopandas as gpd
 from rasterio.warp import calculate_default_transform, reproject, Resampling
 from rasterio.mask import mask
-from rasterio.enums import Resampling as RasterioResampling
 import os
 from scipy import ndimage
+from scipy.ndimage import binary_dilation
 from scipy.interpolate import griddata
 
 # Configure logging
@@ -296,8 +296,6 @@ class Preprocessor:
                 return data
             
             # Use scipy's binary dilation to expand valid areas
-            from scipy.ndimage import binary_dilation
-            
             # Dilate valid areas
             dilated_mask = binary_dilation(valid_mask, iterations=3)
             
